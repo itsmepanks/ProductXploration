@@ -1,0 +1,902 @@
+{
+  "swagger": "2.0",
+  "securityDefinitions": {
+    "oauth": {
+      "type": "oauth2",
+      "tokenUrl": "https://api-test.schneider-electric.com/token",
+      "flow": "application",
+      "scopes": {
+        "GET": "Task Management",
+        "POST": "Task Management",
+        "PUT": "Task Management"
+      }
+    }
+  },
+  "paths": {
+    "/tasks": {
+      "get": {
+        "tags": [
+          "BFO-Task"
+        ],
+        "summary": "To retrieve the list of tasks.",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "X-BFO-Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "The OAUTH  access  token  of  the end user of the  application   calling   the   API ex: 00DR0000001uwzf!ARIAQD9p7FtdFQGaa_coTKt3Dj4ohAz"
+          },
+          {
+            "name": "ownerId",
+            "in": "query",
+            "description": "Id of the task owner",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "open",
+            "in": "query",
+            "description": "Possible values are true and false",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "description": "AccountId of the account",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "contactId",
+            "in": "query",
+            "description": "ContactId of the contact",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "opportunityId",
+            "in": "query",
+            "description": "Opportunity Id which is related to task",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "List Tasks by filter criteria. \nMultiple filter conditions can be joined using Logical Operator (AND). \nList of fields available for additional filters & operators : \n    \n    dueDate (>,<,=),\n    status (=),\n    subject (=),\n    lastModifiedDate (>, <, =)\n\n  Example :\n\n    /tasks?ownerId=0054C000000fSMDQA2&status=open&filter=subject LIKE ‘%fifa%’ AND dueDate = 2017-10-31T00:00:00Z AND status = 'In Progress'AND lastModifiedDate=2017-06-14T12:17:12.000Z\n  \n  Reserved Characters: The escape character is single backslash (\\\\) and must be used with below reserved characters.\n  \n    ' (Single Quote)\n    \\ (Single Backslash)\n    \" (One double-quote character)\n    _ (Single Underscore)\n    % (Single Percent Sign)\n    \n    Example: D'souza must be sent as D\\'souza",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cursorId",
+            "in": "query",
+            "description": "Represents the cursorId of records",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "numRecordsBatch",
+            "in": "query",
+            "description": "Represents the cumulative number of records returned",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "x-auth-type": "Application & Application User",
+        "x-throttling-tier": "Unlimited",
+        "description": "To retrieve the list of tasks. Maximum of 2000 records can be returned in a single call. To retrieve next set of records (pagination), query parameters cursorId and numRecordsBatch must be passed. X-BFO-CursorId and X-BFO-NumRecordsBatch header parameters returned in the response, represents the value to be used in the query parameters cursorId and numRecordsBatch respectively.\n  ** Pagination parameters i.e. cursorId and numRecordsBatch, cannot be used with other parameters and will return a error response if passed.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-BFO-CursorId": {
+                "type": "string",
+                "description": "Represents the unique Id assigned for pagination."
+              },
+              "X-BFO-NumRecordsBatch": {
+                "type": "integer",
+                "description": "Represents the cumulative number of records (batchsize) returned."
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/tasks"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/fault4"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/fault1"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/fault22"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/fault3"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth": [
+              "GET"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "BFO-Task"
+        ],
+        "summary": "To create a new task",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "X-BFO-Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "The OAUTH  access  token  of  the end user of the  application   calling   the   API ex: 00DR0000001uwzf!ARIAQD9p7FtdFQGaa_coTKt3Dj4ohAz"
+          },
+          {
+            "name": "request",
+            "description": "Request Body",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/taskModelForPostPut"
+            }
+          }
+        ],
+        "x-auth-type": "Application & Application User",
+        "x-throttling-tier": "Unlimited",
+        "description": "To create a new task",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/taskResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/fault4"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/fault1"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/fault3"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth": [
+              "POST"
+            ]
+          }
+        ]
+      }
+    },
+    "/tasks/{taskId}": {
+      "get": {
+        "tags": [
+          "BFO-Task"
+        ],
+        "summary": "To retrieve task details based on the task Id provided",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "X-BFO-Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "The OAUTH  access  token  of  the end user of the  application   calling   the   API ex: 00DR0000001uwzf!ARIAQD9p7FtdFQGaa_coTKt3Dj4ohAz"
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The task Id for which details are to be retrieved."
+          }
+        ],
+        "x-auth-type": "Application & Application User",
+        "x-throttling-tier": "Unlimited",
+        "description": "To retrieve task details based on the task Id provided",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/taskModelForDetails"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/fault4"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/fault1"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/fault21"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/fault3"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth": [
+              "GET"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "BFO-Task"
+        ],
+        "summary": "To update task details based on the task Id provided",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "X-BFO-Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "The OAUTH  access  token  of  the end user of the  application   calling   the   API ex: 00DR0000001uwzf!ARIAQD9p7FtdFQGaa_coTKt3Dj4ohAz"
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The task Id for which details are to be updated."
+          },
+          {
+            "name": "request",
+            "description": "Request Body",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/taskModelForPostPut"
+            }
+          }
+        ],
+        "x-auth-type": "Application & Application User",
+        "x-throttling-tier": "Unlimited",
+        "description": "To update task details based on the task Id provided",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/taskResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/fault4"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/fault1"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/fault21"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/fault3"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth": [
+              "PUT"
+            ]
+          }
+        ]
+      }
+    },
+    "/tasks/meta": {
+      "get": {
+        "tags": [
+          "BFO-Task"
+        ],
+        "summary": "To retrieve task metadata (picklists)",
+        "parameters": [
+          {
+            "name": "X-BFO-Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "The OAUTH access token of the end user of the application   calling the API ex: 00DR0000001uwzf!ARIAQD9p7FtdFQGaa_coTKt3Dj4ohAz"
+          }
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "x-auth-type": "Application & Application User",
+        "x-throttling-tier": "Unlimited",
+        "description": "To retrieve task metadata (picklists)",
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/metadata"
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/fault1"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/fault23"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/fault3"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth": [
+              "GET"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "tasks": {
+      "type": "array",
+      "xml": {
+        "wrapped": true
+      },
+      "items": {
+        "$ref": "#/definitions/taskModelForList"
+      }
+    },
+    "taskModelForList": {
+      "title": "task",
+      "description": "Contains fields required for task listing",
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "description": "Represents the Task ID",
+          "type": "string"
+        },
+        "dueDate": {
+          "description": "Represents the Due Date",
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string",
+          "description": "Represents the Account Id"
+        },
+        "contact": {
+          "description": "Represents the name of the contact",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Represents the Id of Contact"
+            },
+            "name": {
+              "type": "string",
+              "description": "Represents the Name of Contact"
+            }
+          }
+        },
+        "relatedTo": {
+          "description": "Represents the relatedTo Complex element",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Represents the related Id"
+            },
+            "name": {
+              "type": "string",
+              "description": "Represents the related Name"
+            }
+          }
+        },
+        "owner": {
+          "description": "Represents the Owner",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Represents the Owner Id"
+            },
+            "name": {
+              "type": "string",
+              "description": "Represents the Owner Name"
+            }
+          }
+        },
+        "status": {
+          "description": "Represents the Task Status",
+          "type": "string"
+        },
+        "subject": {
+          "description": "Represents the Task Subject",
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "description": "Represents the Last Modified Date Time of the record",
+          "type": "string",
+          "example": "2017-06-14T12:17:12.000Z"
+        }
+      },
+      "xml": {
+        "name": "task"
+      }
+    },
+    "taskModelForDetails": {
+      "title": "task",
+      "description": "Contains fields required for task details",
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "description": "Represents the Task ID",
+          "type": "string"
+        },
+        "owner": {
+          "description": "Represents the Owner",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Represents the Owner Id"
+            },
+            "name": {
+              "type": "string",
+              "description": "Represents the Owner Name"
+            }
+          }
+        },
+        "description": {
+          "description": "represents the Comments or Description",
+          "type": "string"
+        },
+        "dueDate": {
+          "description": "represents the Due Date",
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string",
+          "description": "Represents the Account Id"
+        },
+        "contact": {
+          "description": "Represents the name of the contact",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Represents the Id of Contact"
+            },
+            "name": {
+              "type": "string",
+              "description": "Represents the Name of Contact"
+            }
+          }
+        },
+        "relatedTo": {
+          "description": "Represents the relatedTo Complex element",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Represents the related Id"
+            },
+            "name": {
+              "type": "string",
+              "description": "Represents the related Name"
+            }
+          }
+        },
+        "priority": {
+          "description": "represents the Priority",
+          "type": "string"
+        },
+        "status": {
+          "description": "represents the Status",
+          "type": "string"
+        },
+        "subject": {
+          "description": "represents the Subject",
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "task"
+      }
+    },
+    "taskModelForPostPut": {
+      "title": "task",
+      "description": "Contains fields required for creating a task",
+      "type": "object",
+      "properties": {
+        "owner": {
+          "description": "represents the Owner Id.Restriction of 18 characters. Example-00511000005FmUyAAK",
+          "type": "string"
+        },
+        "description": {
+          "description": "represents the Comments or Description",
+          "type": "string"
+        },
+        "dueDate": {
+          "description": "represents the Due Date. Example value-      2017-07-28T08:57:13.000Z",
+          "type": "string"
+        },
+        "contactId": {
+          "description": "Represents the  contact Id. Restriction of 18 characters. Example-0031100001Eq3fzAAB",
+          "type": "string"
+        },
+        "relatedToId": {
+          "description": "Represents either AccountId or ContactId. Restriction of 18 characters. Example-a2H110000013rrHEAQ",
+          "type": "string"
+        },
+        "priority": {
+          "description": "represents the Priority picklist. Picklist values can be Low,Normal,High",
+          "type": "string"
+        },
+        "status": {
+          "description": "represents the Status picklist. The values can be Completed, In Progress, Cancelled, etc.",
+          "type": "string"
+        },
+        "subject": {
+          "description": "represents the Subject. The values can be Migration Finish, Refresh Start,Refresh Finish, etc",
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "task"
+      }
+    },
+    "taskResponse": {
+      "description": "Contains field(s) returned as response after creating/updating a task",
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "description": "Represents the Task ID",
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "task"
+      }
+    },
+    "metadata": {
+      "type": "array",
+      "xml": {
+        "wrapped": true,
+        "name": "task"
+      },
+      "items": {
+        "$ref": "#/definitions/fields"
+      }
+    },
+    "fields": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Represents the name of the field"
+        },
+        "label": {
+          "type": "string",
+          "description": "Represents the UI label of the field"
+        },
+        "dependentPicklist": {
+          "type": "boolean",
+          "description": "True, if dependent picklist. False, otherwise"
+        },
+        "restrictedPicklist": {
+          "type": "boolean",
+          "description": "True, if restricted picklist. False, otherwise"
+        },
+        "controllerName": {
+          "type": "string",
+          "description": "Represents the Controller Name of the field"
+        },
+        "picklistValues": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "active": {
+                "type": "boolean",
+                "description": "True, if active. False, otherwise"
+              },
+              "defaultValue": {
+                "type": "string",
+                "description": "Represents the default value of the field"
+              },
+              "label": {
+                "type": "string",
+                "description": "Represent the label of the picklist item"
+              },
+              "validFor": {
+                "type": "string",
+                "description": "Represents the Valid For"
+              },
+              "value": {
+                "type": "string",
+                "description": "Represent the value of the picklist item"
+              }
+            }
+          }
+        }
+      },
+      "xml": {
+        "name": "fields"
+      }
+    },
+    "fault1": {
+      "type": "object",
+      "xml": {
+        "name": "fault"
+      },
+      "properties": {
+        "fault": {
+          "type": "object",
+          "$ref": "#/definitions/fault11"
+        }
+      }
+    },
+    "fault21": {
+      "type": "object",
+      "xml": {
+        "name": "fault"
+      },
+      "properties": {
+        "fault": {
+          "type": "object",
+          "$ref": "#/definitions/fault221"
+        }
+      }
+    },
+    "fault22": {
+      "type": "object",
+      "xml": {
+        "name": "fault"
+      },
+      "properties": {
+        "fault": {
+          "type": "object",
+          "$ref": "#/definitions/fault222"
+        }
+      }
+    },
+    "fault23": {
+      "type": "object",
+      "xml": {
+        "name": "fault"
+      },
+      "properties": {
+        "fault": {
+          "type": "object",
+          "$ref": "#/definitions/fault223"
+        }
+      }
+    },
+    "fault3": {
+      "type": "object",
+      "xml": {
+        "name": "fault"
+      },
+      "properties": {
+        "fault": {
+          "type": "object",
+          "$ref": "#/definitions/fault33"
+        }
+      }
+    },
+    "fault4": {
+      "type": "object",
+      "xml": {
+        "name": "fault"
+      },
+      "properties": {
+        "fault": {
+          "type": "object",
+          "$ref": "#/definitions/fault44"
+        }
+      }
+    },
+    "fault11": {
+      "title": "fault",
+      "xml": {
+        "name": "fault"
+      },
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "INVALID_ACCESS_TOKEN",
+          "description": "code"
+        },
+        "description": {
+          "type": "string",
+          "example": "<Response from BFO>",
+          "description": "description"
+        }
+      }
+    },
+    "fault221": {
+      "title": "fault",
+      "xml": {
+        "name": "fault"
+      },
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "NOT_FOUND",
+          "description": "code"
+        },
+        "description": {
+          "type": "string",
+          "example": "Task not found",
+          "description": "description"
+        }
+      }
+    },
+    "fault222": {
+      "title": "fault",
+      "xml": {
+        "name": "fault"
+      },
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "NOT_FOUND",
+          "description": "code"
+        },
+        "description": {
+          "type": "string",
+          "example": "Tasks not found",
+          "description": "description"
+        }
+      }
+    },
+    "fault223": {
+      "title": "fault",
+      "xml": {
+        "name": "fault"
+      },
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "NOT_FOUND",
+          "description": "code"
+        },
+        "description": {
+          "type": "string",
+          "example": "Metadata not found",
+          "description": "description"
+        }
+      }
+    },
+    "fault33": {
+      "title": "fault",
+      "xml": {
+        "name": "fault"
+      },
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "INTERNAL_SERVER_ERROR",
+          "description": "code"
+        },
+        "description": {
+          "type": "string",
+          "example": "Some error",
+          "description": "description"
+        }
+      }
+    },
+    "fault44": {
+      "title": "fault",
+      "xml": {
+        "name": "fault"
+      },
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "BAD_REQUEST",
+          "description": "code"
+        },
+        "description": {
+          "type": "string",
+          "example": "Some error",
+          "description": "description"
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "BFO-Task",
+    "version": "1.0",
+    "description": "API to manage tasks in bFO"
+  },
+  "host": "api-test.schneider-electric.com",
+  "basePath": "/rest/bfo/task/1.0",
+  "schemes": [
+    "https"
+  ]
+}
